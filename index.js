@@ -4,9 +4,10 @@ const findUp = require("find-up");
 const { promiseFiles } = require("node-dir");
 const tryGet = require("try-get");
 const fs = require("fs");
+const serialize = require("serialize-javascript");
 
 module.exports = rootPath => {
-  const setup = (async () => {
+  const setup = async () => {
     const filePaths = await promiseFiles(rootPath);
     const folderStructure = {};
     filePaths.forEach(path => {
@@ -30,14 +31,14 @@ module.exports = rootPath => {
       }
     });
     return folderStructure;
-  })();
+  };
   return {
     async get(path) {
-      const folderStructure = await setup;
+      const folderStructure = await setup();
       return tryGet(folderStructure, path);
     },
     async set(path, value) {
-      const folderStructure = await setup;
+      const folderStructure = await setup();
       const components = path.split(".");
       let ref = folderStructure;
       let fileData;
@@ -56,7 +57,7 @@ module.exports = rootPath => {
       });
       const filePath = fileData.__filePath;
       delete fileData.__filePath;
-      fs.writeFileSync(filePath, JSON.stringify(fileData));
+      fs.writeFileSync(filePath, `module.exports = ${serialize(fileData, {space: 2})};`);
       fileData.__filePath = filePath;
     },
     async link(path) {}

@@ -1,4 +1,5 @@
 const path = require("path");
+const fs = require("fs");
 
 const { get, set, link } = require("./")(path.resolve("./fixtures"));
 
@@ -16,4 +17,5 @@ test("setting an attribute in a json file", async () => {
   expect(await get("blah.baz.nested.justSet")).toBe("to something");
   await set("blah.baz.nested.justSet", undefined);
   expect(await get("blah.baz.nested.justSet")).toBe(undefined);
+  expect(fs.readFileSync("./fixtures/blah/baz.js").toString('utf8')).toMatchSnapshot();
 });

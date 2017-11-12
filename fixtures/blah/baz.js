@@ -1,1 +1,5 @@
-{"nested":{"simple":"object"}}
+module.exports = {
+  "nested": {
+    "simple": "object"
+  }
+};
