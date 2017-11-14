@@ -1,6 +1,6 @@
 {
   "name": "json-fs-db",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Database split between folders and json files",
   "main": "index.js",
   "repository": "git@github.com:brysgo/json-fs-db.git",
@@ -12,8 +12,8 @@
   },
   "devDependencies": {
     "jest-cli": "^21.2.1",
-    "prettier": "^1.8.2",
-    "json-fs-db": "file:."
+    "json-fs-db": "file:.",
+    "prettier": "^1.8.2"
   },
   "scripts": {
     "test": "jest --watch --runInBand"
