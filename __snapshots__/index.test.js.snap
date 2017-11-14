@@ -1,9 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`setting an attribute in a json file 1`] = `
-"module.exports = {
+"const { link } = require(\\"json-fs-db\\")(\\"../../\\");
+module.exports = {
   \\"nested\\": {
     \\"simple\\": \\"object\\"
-  }
+  },
+  \\"confirmed\\": \\"here it is\\"
 };"
 `;

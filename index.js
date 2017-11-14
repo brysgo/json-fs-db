@@ -4,10 +4,11 @@ const findUp = require("find-up");
 const { promiseFiles } = require("node-dir");
 const tryGet = require("try-get");
 const fs = require("fs");
-const serialize = require("serialize-javascript");
 
 module.exports = rootPath => {
+  let blockers = [];
   const setup = async () => {
+    await Promise.all(blockers);
     const filePaths = await promiseFiles(rootPath);
     const folderStructure = {};
     filePaths.forEach(path => {
@@ -26,13 +27,14 @@ module.exports = rootPath => {
         };
         lastDirObj[lastComponent.split(".")[0]] = fileContents;
       } catch (error) {
+        console.error(error);
         folderStructure.errors = folderStructure.errors || [];
         folderStructure.errors.push({ path, error });
       }
     });
     return folderStructure;
   };
-  return {
+  const db = {
     async get(path) {
       const folderStructure = await setup();
       return tryGet(folderStructure, path);
@@ -49,17 +51,34 @@ module.exports = rootPath => {
         if (components.length - 1 === i) {
           ref[component] = value;
         } else {
-          if (!ref[component]) {
+          if (ref[component] === undefined) {
             ref[component] = {};
           }
           ref = ref[component];
         }
       });
       const filePath = fileData.__filePath;
+      const relPath = filePath.slice(rootPath.length + 1);
+      const toRoot = relPath.split("/").reduce((acc, cur) => acc + "../", "");
       delete fileData.__filePath;
-      fs.writeFileSync(filePath, `module.exports = ${serialize(fileData, {space: 2})};`);
+      const serialized = JSON.stringify(fileData, null, 2);
+      const output = `const { link } = require("json-fs-db")("${toRoot}");
+module.exports = ${serialized
+        .replace('"$$json-fs-db$$', 'link("')
+        .replace('$$json-fs-db$$"', '")')};`;
+      fs.writeFileSync(filePath, output);
       fileData.__filePath = filePath;
     },
-    async link(path) {}
+    link(path) {
+      const result = {};
+      blockers.push(
+        db.get(path).then(data => {
+          Object.assign(result, data);
+        })
+      );
+      result.toJSON = () => `$$json-fs-db$$${path}$$json-fs-db$$`;
+      return result;
+    }
   };
+  return db;
 };
