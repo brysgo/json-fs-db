@@ -6,6 +6,7 @@
   "repository": "git@github.com:brysgo/json-fs-db.git",
   "author": "Bryan Goldstein <brysgo@gmail.com>",
   "license": "MIT",
+  "engines" : { "node" : ">=8.4.0" },
   "dependencies": {
     "node-dir": "^0.1.17",
     "try-get": "^1.0.0"
