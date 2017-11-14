@@ -1,5 +1,7 @@
 # JSON FS DB
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/brysgo/json-fs-db.svg)](https://greenkeeper.io/)
+
 Database split between folders and json files.
 
 By introspecting on folder structure, JSON FS DB stores information where you
