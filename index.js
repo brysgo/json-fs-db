@@ -1,7 +1,8 @@
 // Configurable flat file database
 
 const findUp = require("find-up");
-const { promiseFiles } = require("node-dir");
+const { promisify } = require("util");
+const paths = promisify(require("node-dir").paths);
 const tryGet = require("try-get");
 const fs = require("fs");
 
@@ -9,17 +10,26 @@ module.exports = rootPath => {
   let blockers = [];
   const setup = async () => {
     await Promise.all(blockers);
-    const filePaths = await promiseFiles(rootPath);
+    const fileAndFolderPaths = await paths(rootPath);
+    const { files: filePaths, dirs: dirPaths } = fileAndFolderPaths;
     const folderStructure = {};
+    dirPaths.forEach(path => {
+      const relPath = path.slice(rootPath.length + 1);
+      const components = relPath.split("/");
+      components.reduce((acc, component) => {
+        acc[component] = acc[component] || {};
+        return acc[component];
+      }, folderStructure);
+    });
     filePaths.forEach(path => {
       const relPath = path.slice(rootPath.length + 1);
       const components = relPath.split("/");
       const lastComponent = components.pop();
-      if (lastComponent.indexOf(".js") === -1) return;
       const lastDirObj = components.reduce((acc, component) => {
         acc[component] = acc[component] || {};
         return acc[component];
       }, folderStructure);
+      if (lastComponent.indexOf(".js") === -1) return;
       try {
         const fileContents = {
           __filePath: path,
@@ -43,13 +53,30 @@ module.exports = rootPath => {
       const folderStructure = await setup();
       const components = path.split(".");
       let ref = folderStructure;
+      let currentPath = rootPath;
       let fileData;
       components.forEach((component, i) => {
-        if (!fileData && Object.keys(ref).includes("__filePath")) {
-          fileData = ref;
+        currentPath = [currentPath, component].join("/");
+        if (!fileData) {
+          if (Object.keys(ref).includes("__filePath")) {
+            fileData = ref;
+          } else if (
+            ref[component] &&
+            Object.keys(ref[component]).includes("__filePath")
+          ) {
+            fileData = ref[component];
+          }
+          if (!ref[component]) {
+            ref[component] = { __filePath: currentPath + ".js" };
+            fileData = ref[component];
+          }
         }
         if (components.length - 1 === i) {
-          ref[component] = value;
+          if (typeof ref[component] === "object" && typeof value === "object") {
+            Object.assign(ref[component], value);
+          } else {
+            ref[component] = value;
+          }
         } else {
           if (ref[component] === undefined) {
             ref[component] = {};

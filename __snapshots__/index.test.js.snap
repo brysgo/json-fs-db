@@ -9,3 +9,20 @@ module.exports = {
   \\"confirmed\\": \\"here it is\\"
 };"
 `;
+
+exports[`setting an attribute when the file does not exist 1`] = `
+"const { link } = require(\\"json-fs-db\\")(\\"../../\\");
+module.exports = {
+  \\"new\\": \\"file\\"
+};"
+`;
+
+exports[`setting an object 1`] = `
+"const { link } = require(\\"json-fs-db\\")(\\"../../\\");
+module.exports = {
+  \\"nested\\": {
+    \\"simple\\": \\"object\\"
+  },
+  \\"confirmed\\": \\"here it is\\"
+};"
+`;
