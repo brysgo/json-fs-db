@@ -1,27 +1,21 @@
 // Configurable flat file database
 
 const findUp = require("find-up");
-const { promisify } = require("util");
-const paths = promisify(require("node-dir").paths);
+const { promiseFiles } = require("node-dir");
 const tryGet = require("try-get");
 const fs = require("fs");
 
-module.exports = rootPath => {
+module.exports = (rootPath, options) => {
   let blockers = [];
   const setup = async () => {
     await Promise.all(blockers);
-    const fileAndFolderPaths = await paths(rootPath);
-    const { files: filePaths, dirs: dirPaths } = fileAndFolderPaths;
+    console.log("start dir", options);
+    const filePaths = await promiseFiles(rootPath, {exclude: options.exclude[0]});
+    console.log("end dir");
     const folderStructure = {};
-    dirPaths.forEach(path => {
-      const relPath = path.slice(rootPath.length + 1);
-      const components = relPath.split("/");
-      components.reduce((acc, component) => {
-        acc[component] = acc[component] || {};
-        return acc[component];
-      }, folderStructure);
-    });
     filePaths.forEach(path => {
+      if (options.exclude && options.exlude.some(regex => path.match(regex)))
+        return;
       const relPath = path.slice(rootPath.length + 1);
       const components = relPath.split("/");
       const lastComponent = components.pop();
