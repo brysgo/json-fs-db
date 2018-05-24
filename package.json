@@ -14,7 +14,7 @@
     "try-get": "^1.0.0"
   },
   "devDependencies": {
-    "jest-cli": "^22.0.0",
+    "jest-cli": "^23.0.0",
     "json-fs-db": "file:.",
     "prettier": "^1.8.2"
   },
