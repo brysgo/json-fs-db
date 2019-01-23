@@ -9,9 +9,12 @@ module.exports = (rootPath, options) => {
   let blockers = [];
   const setup = async () => {
     await Promise.all(blockers);
-    console.log("start dir", options);
-    const filePaths = await promiseFiles(rootPath, {exclude: options.exclude[0]});
-    console.log("end dir");
+    const opts = {};
+    const exclude = tryGet(options, "exclude.0");
+    if (exclude) {
+      opts.exclude = exclude;
+    }
+    const filePaths = await promiseFiles(rootPath, opts);
     const folderStructure = {};
     filePaths.forEach(path => {
       if (options.exclude && options.exlude.some(regex => path.match(regex)))
