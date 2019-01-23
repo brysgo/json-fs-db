@@ -10,8 +10,8 @@
     "node": ">=8.4.0"
   },
   "dependencies": {
-    "node-dir": "^0.1.17",
-    "try-get": "^1.0.0"
+    "try-get": "^1.0.0",
+    "walk": "^2.3.14"
   },
   "devDependencies": {
     "jest-cli": "^22.0.0",

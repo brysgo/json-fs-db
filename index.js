@@ -1,20 +1,33 @@
 // Configurable flat file database
 
 const findUp = require("find-up");
-const { promiseFiles } = require("node-dir");
 const tryGet = require("try-get");
 const fs = require("fs");
+const walk = require("walk");
 
-module.exports = (rootPath, options) => {
+const customWalker = (path) =>
+  new Promise(resolve => {
+    var files = [];
+
+    // Walker options
+    var walker = walk.walk(path, { followLinks: false });
+
+    walker.on("file", function(root, stat, next) {
+      // Add this file to the list of files
+      files.push(root + "/" + stat.name);
+      next();
+    });
+
+    walker.on("end", function() {
+      resolve(files);
+    });
+  });
+
+module.exports = (rootPath, options={}) => {
   let blockers = [];
   const setup = async () => {
     await Promise.all(blockers);
-    const opts = {};
-    const exclude = tryGet(options, "exclude.0");
-    if (exclude) {
-      opts.exclude = exclude;
-    }
-    const filePaths = await promiseFiles(rootPath, opts);
+    const filePaths = await customWalker(rootPath);
     const folderStructure = {};
     filePaths.forEach(path => {
       if (options.exclude && options.exlude.some(regex => path.match(regex)))
