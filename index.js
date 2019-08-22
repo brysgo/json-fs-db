@@ -119,3 +119,4 @@ module.exports = ${serialized
   };
   return db;
 };
+module.exports.default = module.exports;
