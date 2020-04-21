@@ -16,7 +16,7 @@
   "devDependencies": {
     "jest-cli": "^23.6.0",
     "json-fs-db": "file:.",
-    "prettier": "^1.8.2"
+    "prettier": "^2.0.5"
   },
   "scripts": {
     "test": "jest --runInBand"
